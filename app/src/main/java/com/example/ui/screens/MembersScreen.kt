@@ -812,7 +812,9 @@ fun ComplianceSettingsDialog(
 
     AlertDialog(
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.fillMaxWidth(0.94f),
+        modifier = Modifier
+    .fillMaxWidth(0.94f)
+    .heightIn(max = 680.dp),
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -925,7 +927,10 @@ fun DirectMessageDialog(
 
     AlertDialog(
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.fillMaxWidth(0.94f),
+        modifier = Modifier
+    .fillMaxWidth(0.94f)
+    .heightIn(max = 680.dp),
+
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
