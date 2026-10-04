@@ -1249,3 +1249,35 @@ fun CosmicFinanceSummaryCard(
         }
     }
 }
+/**
+ * Voice Command Parser for Gabbai Cosmos Hands-Free Navigation
+ */
+data class GabbaiVoiceCommand(
+    val action: String,
+    val query: String?,
+    val responseMessage: String
+)
+
+object VoiceCommandParser {
+    fun parseCommand(transcript: String): GabbaiVoiceCommand {
+        val t = transcript.lowercase().trim()
+        return when {
+            t.contains("წევრები") || t.contains("members") -> 
+                GabbaiVoiceCommand("NAV_MEMBERS", null, "გადავდივარ წევრების რეესტრში")
+            
+            t.contains("ფინანსები") || t.contains("finance") || t.contains("ვალი") -> 
+                GabbaiVoiceCommand("NAV_FINANCE", null, "ფინანსური ბალანსი და მონიტორინგი")
+            
+            t.contains("ძებნა") || t.contains("მოძებნე") || t.contains("search") -> {
+                val searchQuery = t.replace("ძებნა", "")
+                    .replace("მოძებნე", "")
+                    .replace("search", "")
+                    .trim()
+                GabbaiVoiceCommand("SEARCH_MEMBER", searchQuery, "ვეძებ წევრს: $searchQuery")
+            }
+            
+            else -> GabbaiVoiceCommand("UNKNOWN", null, "ბრძანება ვერ გაირკვა, სცადეთ თავიდან")
+        }
+    }
+}
+
