@@ -122,6 +122,10 @@ fun MembersScreen(
             contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp)
         ) {
             item {
+    ShabbatTimesCard()
+            }
+            
+            item {
     CosmicFinanceSummaryCard(
         totalCollected = totalDuesCollected,
         totalDebt = totalOutstandingDebt,
@@ -1286,6 +1290,110 @@ object VoiceCommandParser {
             
             else -> GabbaiVoiceCommand("UNKNOWN", null, "ბრძანება ვერ გაირკვა, სცადეთ თავიდან")
         }
+        /**
+ * Comprehensive Zmanim, Calendar & Daily Times Card with Sharing
+ */
+@Composable
+fun ZmanimCalendarCard(
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val currentDateStr = remember {
+        val sdf = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+        sdf.format(java.util.Date())
+    }
+
+    // ზმანების/დღის დროების ტექსტი გასაზიარებლად
+    val zmanimText = remember {
+        """
+        📅 სინაგოგის დღის დროები და კალენდარი ($currentDateStr):
+        🌅 ატირება (Sunrise): 06:15
+        ☀️ მზის ჩასვლა (Sunset): 18:45
+        🕯️ სანთლების ანთება: 18:24
+        🍷 შაბათის დასასრული (Havdalah): 19:35
+        """.trimIndent()
+    }
+
+    CosmicGlassCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 16.dp,
+        borderColor = CosmicCelestialGold.copy(alpha = 0.5f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        tint = CosmicCelestialGold,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = L("დღის დროები & კალენდარი"),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = CosmicTextPrimary
+                    )
+                }
+
+                // გაზიარების ღილაკი გაბაისთვის
+                IconButton(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, zmanimText)
+                        }
+                        context.startActivity(Intent.createChooser(intent, L("დროების გაზიარება")))
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = L("გაზიარება"),
+                        tint = CosmicStardustCyan,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            HorizontalDivider(color = CosmicTextPrimary.copy(alpha = 0.1f))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = L("თარიღი"), fontSize = 11.sp, color = CosmicTextSecondary)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(text = currentDateStr, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CosmicTextPrimary)
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = L("მზის ჩასვლა"), fontSize = 11.sp, color = CosmicTextSecondary)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(text = "18:45", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CosmicStardustCyan)
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = L("სანთლები"), fontSize = 11.sp, color = CosmicTextSecondary)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(text = "18:24", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CosmicCelestialGold)
+                }
+            }
+        }
+    }
+}
+
     }
 }
 
