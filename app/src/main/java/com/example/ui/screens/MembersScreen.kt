@@ -1157,3 +1157,87 @@ fun MiSheberachDialog(
         containerColor = CosmicDarkSurface
     )
 }
+/**
+ * Financial Summary Card for Gabbai Cosmos
+ */
+@Composable
+fun CosmicFinanceSummaryCard(
+    totalCollected: Double,
+    totalDebt: Double,
+    currency: String,
+    modifier: Modifier = Modifier
+) {
+    CosmicGlassCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 16.dp,
+        borderColor = CosmicCelestialGold.copy(alpha = 0.5f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.AccountBalanceWallet,
+                        contentDescription = null,
+                        tint = CosmicCelestialGold,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = L("ფინანსური ბალანსი და შემოსავლები"),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = CosmicTextPrimary
+                    )
+                }
+            }
+
+            HorizontalDivider(color = CosmicTextPrimary.copy(alpha = 0.1f))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // შეგროვებული თანხა
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = L("შეგროვებული საწევრო"),
+                        fontSize = 11.sp,
+                        color = CosmicTextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = money(totalCollected, currency),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = CosmicEmeraldSuccess
+                    )
+                }
+
+                // ჯამური ვალი
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = L("სულ გამოსათხოვი ვალი"),
+                        fontSize = 11.sp,
+                        color = CosmicTextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = money(totalDebt, currency),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = CosmicAlertRose
+                    )
+                }
+            }
+        }
+    }
+}
