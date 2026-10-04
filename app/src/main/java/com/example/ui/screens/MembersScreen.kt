@@ -124,6 +124,9 @@ fun MembersScreen(
             item {
     ShabbatTimesCard()
             }
+            item {
+    YahrzeitCard(members = state.members)
+            }
             
             item {
     CosmicFinanceSummaryCard(
@@ -1396,4 +1399,100 @@ fun ZmanimCalendarCard(
 
     }
 }
+/**
+ * Yahrzeit & Memorial Days Upcoming Card for Gabbai Cosmos
+ */
+@Composable
+fun YahrzeitCard(
+    members: List<MemberEntity>,
+    modifier: Modifier = Modifier
+) {
+    val upcomingYahrzeits = remember(members) {
+        members.filter { it.yahrzeitDate.isNotEmpty() }.take(5)
+    }
+
+    CosmicGlassCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 16.dp,
+        borderColor = CosmicCelestialGold.copy(alpha = 0.5f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.EventRepeat,
+                    contentDescription = null,
+                    tint = CosmicCelestialGold,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = L("უახლოესი იარצייטები (יארצייט)"),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = CosmicTextPrimary
+                )
+            }
+
+            HorizontalDivider(color = CosmicTextPrimary.copy(alpha = 0.1f))
+
+            if (upcomingYahrzeits.isEmpty()) {
+                Text(
+                    text = L("იარצიტის ჩანაწერები არ მოიძებნა"),
+                    fontSize = 12.sp,
+                    color = CosmicTextSecondary,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    upcomingYahrzeits.forEach { member ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = member.fullName,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = CosmicTextPrimary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                if (member.hebrewName.isNotEmpty()) {
+                                    Text(
+                                        text = member.hebrewName,
+                                        fontSize = 11.sp,
+                                        color = CosmicCelestialGold,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                            Surface(
+                                color = CosmicCelestialGold.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = member.yahrzeitDate,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = CosmicCelestialGold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
