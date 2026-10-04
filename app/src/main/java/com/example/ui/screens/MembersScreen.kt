@@ -148,8 +148,8 @@ fun MembersScreen(
     ShabbatTimesCard()
             }
             item {
-    YahrzeitCard(members = state.members)
-            }
+    ZmanimCalendarCard()
+}
             
             item {
     CosmicFinanceSummaryCard(
