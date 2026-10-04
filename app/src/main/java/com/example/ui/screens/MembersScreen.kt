@@ -122,6 +122,25 @@ fun MembersScreen(
             contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp)
         ) {
             item {
+    QuickNedarimCard(
+        memberNames = state.members.map { it.fullName },
+        onQuickPledgeAdded = { name, amount, note ->
+            viewModel.addTransaction(
+                title = "ნედერი: $note",
+                type = TransactionType.INCOME,
+                category = FinanceCategory.ALIYOT_TORAH,
+                amount = amount,
+                memberName = name,
+                paymentMethod = "დაპირება",
+                status = TransactionStatus.PLEDGED,
+                note = note,
+                currency = I18n.defaultCurrency
+            )
+        }
+    )
+            }
+            
+            item {
     ShabbatTimesCard()
             }
             item {
@@ -1494,5 +1513,121 @@ fun YahrzeitCard(
         }
     }
 }
+/**
+ * Quick Nedarim (Pledge) Fast Entry Card for Gabbai Cosmos
+ */
+@Composable
+fun QuickNedarimCard(
+    memberNames: List<String>,
+    onQuickPledgeAdded: (memberName: String, amount: Double, note: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var selectedMember by remember { mutableStateOf("") }
+    var amountText by remember { mutableStateOf("") }
+    var pledgeNote by remember { mutableStateOf("") }
+    var showSuccessMessage by remember { mutableStateOf(false) }
+
+    CosmicGlassCard(
+        modifier = modifier.fillMaxWidth(),
+        cornerRadius = 16.dp,
+        borderColor = CosmicCelestialGold.copy(alpha = 0.5f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Bolt,
+                    contentDescription = null,
+                    tint = CosmicCelestialGold,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = L("სწრაფი ნედერი (נדרים מהיר)"),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = CosmicTextPrimary
+                )
+            }
+
+            HorizontalDivider(color = CosmicTextPrimary.copy(alpha = 0.1f))
+
+            // წევრის სახელი ან არჩევა
+            OutlinedTextField(
+                value = selectedMember,
+                onValueChange = { selectedMember = it },
+                label = { Text(L("წევრის სახელი"), fontSize = 12.sp) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // თანხა
+                OutlinedTextField(
+                    value = amountText,
+                    onValueChange = { amountText = it },
+                    label = { Text(L("თანხა"), fontSize = 12.sp) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // შენიშვნა / მიზეზი (მაგ: ალია, לעילוי נשמת)
+                OutlinedTextField(
+                    value = pledgeNote,
+                    onValueChange = { pledgeNote = it },
+                    label = { Text(L("მიზეზი / შენიშვნა"), fontSize = 12.sp) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1.5f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
+
+            Button(
+                onClick = {
+                    val amount = amountText.toDoubleOrNull() ?: 0.0
+                    if (selectedMember.isNotBlank() && amount > 0) {
+                        onQuickPledgeAdded(selectedMember.trim(), amount, pledgeNote.trim())
+                        selectedMember = ""
+                        amountText = ""
+                        pledgeNote = ""
+                        showSuccessMessage = true
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = CosmicCelestialGold,
+                    contentColor = CosmicDarkSpace
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = L("ნედერის დაფიქსირება"), fontWeight = FontWeight.Bold)
+            }
+
+            if (showSuccessMessage) {
+                Text(
+                    text = L("✅ ნედერი წარმატებით დაფიქსირდა!"),
+                    color = CosmicEmeraldSuccess,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
 
 
