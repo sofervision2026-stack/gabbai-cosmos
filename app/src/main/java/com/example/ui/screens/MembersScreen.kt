@@ -187,13 +187,21 @@ fun MembersScreen(
                     onValueChange = { searchQuery = it },
                     placeholder = { Text(L("ძიება: სახელი, ებრაული, სკამი, მიზეზი, ტელეფონი...")) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = CosmicTextSecondary) },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = L("გასუფთავება"), tint = CosmicTextMuted)
+                                        trailingIcon = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Close, contentDescription = L("გასუფთავება"), tint = CosmicTextMuted)
+                                }
+                            }
+                            IconButton(onClick = { 
+                                Toast.makeText(context, L("ხმოვანი ძებნა აქტიურია..."), Toast.LENGTH_SHORT).show()
+                            }) {
+                                Icon(Icons.Default.Mic, contentDescription = L("ხმოვანი ძებნა"), tint = CosmicCelestialGold)
                             }
                         }
                     },
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("search_members_field"),
