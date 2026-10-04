@@ -305,6 +305,13 @@ fun MembersScreen(
                 onDismiss = { memberToMessage = null }
             )
         }
+        if (showMiSheberachDialog) {
+    MiSheberachDialog(
+        members = state.members,
+        onDismiss = { showMiSheberachDialog = false }
+    )
+        }
+        
 
         if (showSheetsExportDialog) {
             SheetsExportDialog(
