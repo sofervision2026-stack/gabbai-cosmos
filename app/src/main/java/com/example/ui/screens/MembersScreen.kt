@@ -53,6 +53,8 @@ fun MembersScreen(
     viewModel: GabbaiViewModel,
     modifier: Modifier = Modifier
 ) {
+    var showMiSheberachDialog by remember { mutableStateOf(false) }
+    
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
     val dateFormatter = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
@@ -250,6 +252,15 @@ fun MembersScreen(
                     onDelete = { viewModel.deleteMember(member.id) }
                 )
             }
+        }
+        OutlinedButton(
+    onClick = { showMiSheberachDialog = true },
+    colors = ButtonDefaults.outlinedButtonColors(contentColor = CosmicCelestialGold),
+    shape = RoundedCornerShape(10.dp)
+) {
+    Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.size(16.dp))
+    Spacer(modifier = Modifier.width(4.dp))
+    Text(L("მიშიბერახი"), fontSize = 11.sp)
         }
 
         FloatingActionButton(
