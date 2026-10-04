@@ -438,6 +438,7 @@ fun AddTransactionDialog(
                     }
                 }
                 // 2. Operation name: pick from the list or type your own in the same field
+                // 2. Operation name: pick from the list or type your own in the same field
                 item {
                     SuggestField(
                         label = L("დასახელება"),
