@@ -1,6 +1,10 @@
 @file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package com.example.ui.screens
 
+import com.example.data.model.TransactionType
+import com.example.data.model.FinanceCategory
+import com.example.data.model.TransactionStatus
+
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
