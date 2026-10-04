@@ -122,6 +122,14 @@ fun MembersScreen(
             contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp)
         ) {
             item {
+    CosmicFinanceSummaryCard(
+        totalCollected = totalDuesCollected,
+        totalDebt = totalOutstandingDebt,
+        currency = I18n.defaultCurrency
+    )
+            }
+            
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
