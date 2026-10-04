@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -64,7 +66,6 @@ fun MembersScreen(
     var showSheetsExportDialog by remember { mutableStateOf(false) }
     var showComplianceSettingsDialog by remember { mutableStateOf(false) }
 
-    // Configurable thresholds for Red List (Req 3)
     var redListDaysThreshold by remember { mutableStateOf(60) }
     var redListAmountThreshold by remember { mutableStateOf(300.0) }
 
@@ -118,7 +119,6 @@ fun MembersScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp),
             contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp)
         ) {
-            // 1. Members and Overview Metrics
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -143,13 +143,11 @@ fun MembersScreen(
                 }
             }
 
-            // 2. Action Bar: Sheets Export & Red/Black List Settings (Req 2 & 3)
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Sheets Export Button (Req 2)
                     Button(
                         onClick = { showSheetsExportDialog = true },
                         colors = ButtonDefaults.buttonColors(containerColor = CosmicEmeraldSuccess),
@@ -161,7 +159,6 @@ fun MembersScreen(
                         Text(L("Sheets / Excel ექსპორტი"), color = CosmicOnAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
                     }
 
-                    // Red/Black List Rules Settings (Req 3)
                     OutlinedButton(
                         onClick = { showComplianceSettingsDialog = true },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = CosmicCelestialGold),
@@ -174,7 +171,6 @@ fun MembersScreen(
                 }
             }
 
-            // 3. Search Field
             item {
                 OutlinedTextField(
                     value = searchQuery,
@@ -199,7 +195,6 @@ fun MembersScreen(
                 )
             }
 
-            // 4. Advanced filter dropdown
             item {
                 val filters = listOf(
                     "ALL" to Lf("ყველა ({0})", state.members.size),
@@ -222,7 +217,6 @@ fun MembersScreen(
                 )
             }
 
-            // 5. Header
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -258,7 +252,6 @@ fun MembersScreen(
             }
         }
 
-        // FAB to register new member
         FloatingActionButton(
             onClick = { showAddDialog = true },
             containerColor = CosmicAuroraBlue,
@@ -271,7 +264,6 @@ fun MembersScreen(
             Icon(Icons.Default.PersonAdd, contentDescription = L("ჯამაათის წევრის დამატება"))
         }
 
-        // Add Member Dialog
         if (showAddDialog) {
             MemberFormDialog(
                 title = L("ჯამაათის ახალი წევრის რეგისტრაცია"),
@@ -284,7 +276,6 @@ fun MembersScreen(
             )
         }
 
-        // Edit Member Dialog (Req 1)
         memberToEdit?.let { editing ->
             MemberFormDialog(
                 title = Lf("მონაცემების რედაქტირება: {0}", editing.fullName),
@@ -297,7 +288,6 @@ fun MembersScreen(
             )
         }
 
-        // Direct Message / SMS / WhatsApp Dialog (Req 2)
         memberToMessage?.let { target ->
             DirectMessageDialog(
                 member = target,
@@ -305,7 +295,6 @@ fun MembersScreen(
             )
         }
 
-        // Sheets Export Dialog (Req 2)
         if (showSheetsExportDialog) {
             SheetsExportDialog(
                 viewModel = viewModel,
@@ -313,7 +302,6 @@ fun MembersScreen(
             )
         }
 
-        // Red & Black List Rules Dialog (Req 3)
         if (showComplianceSettingsDialog) {
             ComplianceSettingsDialog(
                 currentDaysThreshold = redListDaysThreshold,
@@ -358,7 +346,6 @@ fun MemberCardItem(
         borderColor = accent.copy(alpha = 0.55f)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Header: avatar + name (takes all free width) + compact actions
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier.size(44.dp).clip(CircleShape)
@@ -414,7 +401,6 @@ fun MemberCardItem(
                 }
             }
 
-            // Badges on their own full-width line; they wrap to a new line instead of squeezing
             Spacer(Modifier.height(8.dp))
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -505,9 +491,6 @@ private fun MemberInfoLine(icon: androidx.compose.ui.graphics.vector.ImageVector
     }
 }
 
-/**
- * Universal Dialog for adding and editing Jamaat members with Status, Compliance, and Dropdowns (Req 1, 3, 5).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemberFormDialog(
@@ -522,9 +505,7 @@ fun MemberFormDialog(
     var role by remember { mutableStateOf(initialMember?.role ?: MemberRole.CONGREGANT) }
     var tribalStatus by remember { mutableStateOf(initialMember?.tribalStatus ?: "ישראל (ისრაელი)") }
     
-    // Status (Req 1)
     var status by remember { mutableStateOf(initialMember?.status ?: MemberStatus.ACTIVE) }
-    // Compliance Category (Req 3: Normal, Red List, Black List)
     var complianceCategory by remember { mutableStateOf(initialMember?.complianceCategory ?: MemberCompliance.NORMAL) }
     var blackListReason by remember { mutableStateOf(initialMember?.blackListReason ?: "") }
 
@@ -537,11 +518,6 @@ fun MemberFormDialog(
     var lastPaymentAmountText by remember { mutableStateOf((initialMember?.lastPaymentAmount ?: 300.0).toInt().toString()) }
     var yahrzeit by remember { mutableStateOf(initialMember?.yahrzeitDate ?: "") }
     var currency by remember { mutableStateOf(initialMember?.currency ?: I18n.defaultCurrency) }
-
-    var roleDropdownExpanded by remember { mutableStateOf(false) }
-    var tribalDropdownExpanded by remember { mutableStateOf(false) }
-    var statusDropdownExpanded by remember { mutableStateOf(false) }
-    var complianceDropdownExpanded by remember { mutableStateOf(false) }
 
     val tribalOptions = listOf("ישראל (ისრაელი)", "כהן (ქოჰენი)", "לוי (ლევი)")
 
@@ -556,8 +532,8 @@ fun MemberFormDialog(
     AlertDialog(
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
-    .fillMaxWidth(0.94f)
-    .heightIn(max = 680.dp),
+            .fillMaxWidth(0.94f)
+            .heightIn(max = 680.dp),
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -568,169 +544,139 @@ fun MemberFormDialog(
             )
         },
         text = {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                item {
-                    OutlinedTextField(
-                        value = fullName,
-                        onValueChange = { fullName = it },
-                        label = { Text(L("სრული სახელი და გვარი")) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                OutlinedTextField(
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    label = { Text(L("სრული სახელი და გვარი")) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                item {
-                    OutlinedTextField(
-                        value = hebrewName,
-                        onValueChange = { hebrewName = it },
-                        label = { Text(L("ებრაული სახელი თორისთვის (שם לתורה)")) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                OutlinedTextField(
+                    value = hebrewName,
+                    onValueChange = { hebrewName = it },
+                    label = { Text(L("ებრაული სახელი თორისთვის (שם לתורה)")) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                // 1. Membership Status Dropdown (Req 1)
-                item {
-                    AppDropdown(
-                        label = L("ჯამაათის წევრის სტატუსი"),
-                        value = MemberStatus.values().first(),
-                        options = MemberStatus.values().toList(),
-                        optionLabel = { st -> "${st.titleKa} (${st.titleHe})" },
-                        onSelected = { st -> status = st },
-                        displayText = status.titleKa,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                AppDropdown(
+                    label = L("ჯამაათის წევრის სტატუსი"),
+                    value = MemberStatus.values().first(),
+                    options = MemberStatus.values().toList(),
+                    optionLabel = { st -> "${st.titleKa} (${st.titleHe})" },
+                    onSelected = { st -> status = st },
+                    displayText = status.titleKa,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                // 2. Compliance Category Dropdown (Req 3: Red List, Black List)
-                item {
-                    AppDropdown(
-                        label = L("სიის კატეგორია (წითელი/შავი სია)"),
-                        value = MemberCompliance.values().first(),
-                        options = MemberCompliance.values().toList(),
-                        optionLabel = { comp -> comp.titleKa },
-                        onSelected = { comp -> complianceCategory = comp },
-                        displayText = complianceCategory.titleKa,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                AppDropdown(
+                    label = L("სიის კატეგორია (წითელი/შავი სია)"),
+                    value = MemberCompliance.values().first(),
+                    options = MemberCompliance.values().toList(),
+                    optionLabel = { comp -> comp.titleKa },
+                    onSelected = { comp -> complianceCategory = comp },
+                    displayText = complianceCategory.titleKa,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                // Reason for Red/Black List
                 if (complianceCategory != MemberCompliance.NORMAL) {
-                    item {
-                        Column {
-                            OutlinedTextField(
-                                value = blackListReason,
-                                onValueChange = { blackListReason = it },
-                                label = { Text(L("წითელ/შავ სიაში შეყვანის მიზეზი")) },
-                                placeholder = { Text(L("მაგ. უარი განაცხადა გადახდაზე...")) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                items(blackListReasonsPresets) { preset ->
-                                    SuggestionChip(
-                                        onClick = { blackListReason = preset },
-                                        label = { Text(preset, fontSize = 11.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) }
-                                    )
-                                }
+                    Column {
+                        OutlinedTextField(
+                            value = blackListReason,
+                            onValueChange = { blackListReason = it },
+                            label = { Text(L("წითელ/შავ სიაში შეყვანის მიზეზი")) },
+                            placeholder = { Text(L("მაგ. უარი განაცხადა გადახდაზე...")) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            items(blackListReasonsPresets) { preset ->
+                                SuggestionChip(
+                                    onClick = { blackListReason = preset },
+                                    label = { Text(preset, fontSize = 11.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) }
+                                )
                             }
                         }
                     }
                 }
 
-                // Dropdown for Tribal Status (Req 5)
-                item {
-                    AppDropdown(
-                        label = L("სულიერი ხარისხი (თორისთვის)"),
-                        value = tribalOptions.first(),
-                        options = tribalOptions.toList(),
-                        optionLabel = { opt -> opt },
-                        onSelected = { opt -> tribalStatus = opt },
-                        displayText = tribalStatus,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                AppDropdown(
+                    label = L("სულიერი ხარისხი (თორისთვის)"),
+                    value = tribalOptions.first(),
+                    options = tribalOptions.toList(),
+                    optionLabel = { opt -> opt },
+                    onSelected = { opt -> tribalStatus = opt },
+                    displayText = tribalStatus,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                // Dropdown for Synagogue Role (Req 5)
-                item {
-                    AppDropdown(
-                        label = L("როლი სინაგოგაში"),
-                        value = MemberRole.values().first(),
-                        options = MemberRole.values().toList(),
-                        optionLabel = { r -> "${r.titleKa} - ${r.titleHe}" },
-                        onSelected = { r -> role = r },
-                        displayText = "${role.titleKa} (${role.titleHe})",
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                AppDropdown(
+                    label = L("როლი სინაგოგაში"),
+                    value = MemberRole.values().first(),
+                    options = MemberRole.values().toList(),
+                    optionLabel = { r -> "${r.titleKa} - ${r.titleHe}" },
+                    onSelected = { r -> role = r },
+                    displayText = "${role.titleKa} (${role.titleHe})",
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                item {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        OutlinedTextField(
-                            value = phone,
-                            onValueChange = { phone = it },
-                            label = { Text(L("ტელეფონი")) },
-                            singleLine = true,
-                            modifier = Modifier.weight(1.2f)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedTextField(
-                            value = seatNumber,
-                            onValueChange = { seatNumber = it },
-                            label = { Text(L("სკამი / ადგილი")) },
-                            placeholder = { Text("A-12") },
-                            singleLine = true,
-                            modifier = Modifier.weight(0.8f)
-                        )
-                    }
-                }
-
-                item {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
-                        value = familyInfo,
-                        onValueChange = { familyInfo = it },
-                        label = { Text(L("ოჯახური მდგომარეობა (მეუღლე, შვილები)")) },
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text(L("ტელეფონი")) },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.weight(1.2f)
                     )
-                }
-
-                item {
+                    Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
-                        value = address,
-                        onValueChange = { address = it },
-                        label = { Text(L("საცხოვრებელი მისამართი")) },
+                        value = seatNumber,
+                        onValueChange = { seatNumber = it },
+                        label = { Text(L("სკამი / ადგილი")) },
+                        placeholder = { Text("A-12") },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.weight(0.8f)
                     )
                 }
 
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        AmountCurrencyField(L("წლიური საწევრო"), annualFeeText, { annualFeeText = it }, currency, { currency = it })
-                        AmountCurrencyField(L("ალიების / ნედერის ვალი"), debtText, { debtText = it }, currency, { currency = it })
-                    }
+                OutlinedTextField(
+                    value = familyInfo,
+                    onValueChange = { familyInfo = it },
+                    label = { Text(L("ოჯახური მდგომარეობა (მეუღლე, შვილები)")) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = address,
+                    onValueChange = { address = it },
+                    label = { Text(L("საცხოვრებელი მისამართი")) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AmountCurrencyField(L("წლიური საწევრო"), annualFeeText, { annualFeeText = it }, currency, { currency = it })
+                    AmountCurrencyField(L("ალიების / ნედერის ვალი"), debtText, { debtText = it }, currency, { currency = it })
                 }
 
-                item {
-                    AmountCurrencyField(L("ბოლო გადახდილი თანხა"), lastPaymentAmountText, { lastPaymentAmountText = it }, currency, { currency = it })
-                }
+                AmountCurrencyField(L("ბოლო გადახდილი თანხა"), lastPaymentAmountText, { lastPaymentAmountText = it }, currency, { currency = it })
 
-                item {
-                    OutlinedTextField(
-                        value = yahrzeit,
-                        onValueChange = { yahrzeit = it },
-                        label = { Text(L("იარცეიტი (მოხსენიების თარიღი)")) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                OutlinedTextField(
+                    value = yahrzeit,
+                    onValueChange = { yahrzeit = it },
+                    label = { Text(L("იარცეიტი (მოხსენიების თარიღი)")) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         confirmButton = {
@@ -796,10 +742,6 @@ fun MemberFormDialog(
     )
 }
 
-/**
- * Compliance Settings Dialog (Req 3)
- * Allows defining the threshold and conditions for Red and Black lists.
- */
 @Composable
 fun ComplianceSettingsDialog(
     currentDaysThreshold: Int,
@@ -813,8 +755,8 @@ fun ComplianceSettingsDialog(
     AlertDialog(
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
-    .fillMaxWidth(0.94f)
-    .heightIn(max = 680.dp),
+            .fillMaxWidth(0.94f)
+            .heightIn(max = 680.dp),
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -832,6 +774,7 @@ fun ComplianceSettingsDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -901,9 +844,6 @@ fun ComplianceSettingsDialog(
     )
 }
 
-/**
- * Direct Message Dialog (Req 2)
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectMessageDialog(
@@ -928,9 +868,8 @@ fun DirectMessageDialog(
     AlertDialog(
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
-    .fillMaxWidth(0.94f)
-    .heightIn(max = 680.dp),
-
+            .fillMaxWidth(0.94f)
+            .heightIn(max = 680.dp),
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -955,10 +894,10 @@ fun DirectMessageDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Template Selector Dropdown
                 AppDropdown(
                     label = L("სწრაფი შაბლონები"),
                     value = templates.first(),
@@ -969,7 +908,6 @@ fun DirectMessageDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Message Text Field
                 OutlinedTextField(
                     value = messageText,
                     onValueChange = { messageText = it },
@@ -979,12 +917,10 @@ fun DirectMessageDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Dispatch Options
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // WhatsApp Button
                     Button(
                         onClick = {
                             if (cleanPhone.isEmpty()) {
@@ -1006,7 +942,6 @@ fun DirectMessageDialog(
                         Text("WhatsApp", color = CosmicTextPrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
 
-                    // SMS Button
                     Button(
                         onClick = {
                             if (cleanPhone.isEmpty()) {
@@ -1030,7 +965,6 @@ fun DirectMessageDialog(
                         Text("SMS", color = CosmicOnAccent, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
 
-                    // Phone Call Button
                     Button(
                         onClick = {
                             if (cleanPhone.isEmpty()) {
