@@ -126,37 +126,38 @@ fun MembersScreen(
             contentPadding = PaddingValues(top = 12.dp, bottom = 96.dp)
         ) {
             item {
-    QuickNedarimCard(
-        memberNames = state.members.map { it.fullName },
-        onQuickPledgeAdded = { name, amount, note ->
-            viewModel.addTransaction(
-                title = "ნედერი: $note",
-                type = TransactionType.INCOME,
-                category = FinanceCategory.ALIYOT_TORAH,
-                amount = amount,
-                memberName = name,
-                paymentMethod = "დაპირება",
-                status = TransactionStatus.PLEDGED,
-                note = note,
-                currency = I18n.defaultCurrency
-            )
-        }
-    )
+                QuickNedarimCard(
+                    memberNames = state.members.map { it.fullName },
+                    onQuickPledgeAdded = { name, amount, note ->
+                        viewModel.addTransaction(
+                            title = "ნედერი: $note",
+                            type = TransactionType.INCOME,
+                            category = FinanceCategory.ALIYOT_TORAH,
+                            amount = amount,
+                            memberName = name,
+                            paymentMethod = "დაპირება",
+                            status = TransactionStatus.PLEDGED,
+                            note = note,
+                            currency = I18n.defaultCurrency
+                        )
+                    }
+                )
             }
             
             item {
-    ShabbatTimesCard()
+                ZmanimCalendarCard()
             }
+
             item {
-    ZmanimCalendarCard()
-}
+                YahrzeitCard(members = state.members)
+            }
             
             item {
-    CosmicFinanceSummaryCard(
-        totalCollected = totalDuesCollected,
-        totalDebt = totalOutstandingDebt,
-        currency = I18n.defaultCurrency
-    )
+                CosmicFinanceSummaryCard(
+                    totalCollected = totalDuesCollected,
+                    totalDebt = totalOutstandingDebt,
+                    currency = I18n.defaultCurrency
+                )
             }
             
             item {
@@ -217,7 +218,7 @@ fun MembersScreen(
                     onValueChange = { searchQuery = it },
                     placeholder = { Text(L("ძიება: სახელი, ებრაული, სკამი, მიზეზი, ტელეფონი...")) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = CosmicTextSecondary) },
-                                        trailingIcon = {
+                    trailingIcon = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { searchQuery = "" }) {
@@ -231,7 +232,6 @@ fun MembersScreen(
                             }
                         }
                     },
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("search_members_field"),
@@ -299,14 +299,18 @@ fun MembersScreen(
                 )
             }
         }
+
         OutlinedButton(
-    onClick = { showMiSheberachDialog = true },
-    colors = ButtonDefaults.outlinedButtonColors(contentColor = CosmicCelestialGold),
-    shape = RoundedCornerShape(10.dp)
-) {
-    Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.size(16.dp))
-    Spacer(modifier = Modifier.width(4.dp))
-    Text(L("მიშიბერახი"), fontSize = 11.sp)
+            onClick = { showMiSheberachDialog = true },
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = CosmicCelestialGold),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(bottom = 84.dp, start = 20.dp)
+        ) {
+            Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(L("მიშიბერახი"), fontSize = 11.sp)
         }
 
         FloatingActionButton(
@@ -351,13 +355,13 @@ fun MembersScreen(
                 onDismiss = { memberToMessage = null }
             )
         }
+
         if (showMiSheberachDialog) {
-    MiSheberachDialog(
-        members = state.members,
-        onDismiss = { showMiSheberachDialog = false }
-    )
+            MiSheberachDialog(
+                members = state.members,
+                onDismiss = { showMiSheberachDialog = false }
+            )
         }
-        
 
         if (showSheetsExportDialog) {
             SheetsExportDialog(
@@ -831,7 +835,7 @@ fun ComplianceSettingsDialog(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = CosmicTextPrimary
-                )
+                               )
             }
         },
         text = {
@@ -879,7 +883,7 @@ fun ComplianceSettingsDialog(
                         )
                         Text(
                             text = L("• წევრმა უარი განაცხადა გადახდაზე\n• ცნობილი გახდა, რომ გადახდისუუნაროა\n• გაბაის სანქციით დაბლოკილია აუქციონზე გამოძახება"),
-                            fontSize = 11.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
+                            fontSize = 11.sp, maxLines = 3, overflow = TextOverflow.Ellipsis,
                             color = CosmicTextSecondary,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -918,7 +922,6 @@ fun DirectMessageDialog(
     var messageText by remember {
         mutableStateOf(Lf("შალომ {0}! მოგესალმებით სინაგოგის გაბაისგან.", member.fullName))
     }
-    var templateDropdownExpanded by remember { mutableStateOf(false) }
 
     val cleanPhone = member.phone.replace("[^0-9+]".toRegex(), "")
 
@@ -1060,6 +1063,7 @@ fun DirectMessageDialog(
         containerColor = CosmicDarkSurface
     )
 }
+
 /**
  * Mi Sheberach Generator Dialog for Synagogue Readers & Gabbai
  */
@@ -1070,7 +1074,7 @@ fun MiSheberachDialog(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-    var selectedType by remember { mutableStateOf("HEALTH") } // HEALTH or DONATION
+    var selectedType by remember { mutableStateOf("HEALTH") }
 
     val targetMembers = remember(members, selectedType) {
         if (selectedType == "HEALTH") {
@@ -1096,8 +1100,7 @@ fun MiSheberachDialog(
         }
         sb.toString()
     }
-
-    AlertDialog(
+        AlertDialog(
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
             .fillMaxWidth(0.94f)
@@ -1203,6 +1206,7 @@ fun MiSheberachDialog(
         containerColor = CosmicDarkSurface
     )
 }
+
 /**
  * Financial Summary Card for Gabbai Cosmos
  */
@@ -1252,7 +1256,6 @@ fun CosmicFinanceSummaryCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // შეგროვებული თანხა
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = L("შეგროვებული საწევრო"),
@@ -1268,7 +1271,6 @@ fun CosmicFinanceSummaryCard(
                     )
                 }
 
-                // ჯამური ვალი
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = L("სულ გამოსათხოვი ვალი"),
@@ -1287,6 +1289,7 @@ fun CosmicFinanceSummaryCard(
         }
     }
 }
+
 /**
  * Voice Command Parser for Gabbai Cosmos Hands-Free Navigation
  */
@@ -1316,7 +1319,10 @@ object VoiceCommandParser {
             
             else -> GabbaiVoiceCommand("UNKNOWN", null, "ბრძანება ვერ გაირკვა, სცადეთ თავიდან")
         }
-        /**
+    }
+}
+
+/**
  * Comprehensive Zmanim, Calendar & Daily Times Card with Sharing
  */
 @Composable
@@ -1329,7 +1335,6 @@ fun ZmanimCalendarCard(
         sdf.format(java.util.Date())
     }
 
-    // ზმანების/დღის დროების ტექსტი გასაზიარებლად
     val zmanimText = remember {
         """
         📅 სინაგოგის დღის დროები და კალენდარი ($currentDateStr):
@@ -1372,7 +1377,6 @@ fun ZmanimCalendarCard(
                     )
                 }
 
-                // გაზიარების ღილაკი გაბაისთვის
                 IconButton(
                     onClick = {
                         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -1420,8 +1424,6 @@ fun ZmanimCalendarCard(
     }
 }
 
-    }
-}
 /**
  * Yahrzeit & Memorial Days Upcoming Card for Gabbai Cosmos
  */
@@ -1456,7 +1458,7 @@ fun YahrzeitCard(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = L("უახლოესი იარצייטები (יארצייט)"),
+                    text = L("უახლოესი იარცייטები (יארצייט)"),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = CosmicTextPrimary
@@ -1467,7 +1469,7 @@ fun YahrzeitCard(
 
             if (upcomingYahrzeits.isEmpty()) {
                 Text(
-                    text = L("იარצიტის ჩანაწერები არ მოიძებნა"),
+                    text = L("იარციტის ჩანაწერები არ მოიძებნა"),
                     fontSize = 12.sp,
                     color = CosmicTextSecondary,
                     modifier = Modifier.padding(vertical = 4.dp)
@@ -1517,6 +1519,7 @@ fun YahrzeitCard(
         }
     }
 }
+
 /**
  * Quick Nedarim (Pledge) Fast Entry Card for Gabbai Cosmos
  */
@@ -1562,7 +1565,6 @@ fun QuickNedarimCard(
 
             HorizontalDivider(color = CosmicTextPrimary.copy(alpha = 0.1f))
 
-            // წევრის სახელი ან არჩევა
             OutlinedTextField(
                 value = selectedMember,
                 onValueChange = { selectedMember = it },
@@ -1576,7 +1578,6 @@ fun QuickNedarimCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // თანხა
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = { amountText = it },
@@ -1587,7 +1588,6 @@ fun QuickNedarimCard(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                // შენიშვნა / მიზეზი (მაგ: ალია, לעילוי נשמת)
                 OutlinedTextField(
                     value = pledgeNote,
                     onValueChange = { pledgeNote = it },
@@ -1602,7 +1602,7 @@ fun QuickNedarimCard(
                 onClick = {
                     val amount = amountText.toDoubleOrNull() ?: 0.0
                     if (selectedMember.isNotBlank() && amount > 0) {
-                        onQuickPledgeAdded(selectedMember.trim(), amount, pledgeNote.trim())
+                                   onQuickPledgeAdded(selectedMember.trim(), amount, pledgeNote.trim())
                         selectedMember = ""
                         amountText = ""
                         pledgeNote = ""
@@ -1611,7 +1611,7 @@ fun QuickNedarimCard(
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = CosmicCelestialGold,
-                    contentColor = CosmicDarkSpace
+                    contentColor = CosmicDarkSurface
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -1632,6 +1632,3 @@ fun QuickNedarimCard(
         }
     }
 }
-
-
-
