@@ -1,0 +1,6 @@
+{
+  "name": "Gabbai Cosmos",
+  "description": "Ultra-modern cosmic synagogue Gabbai management system with encrypted finances, Kollel tracking, Aliyot, Tzedakah, and complete technical docs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
